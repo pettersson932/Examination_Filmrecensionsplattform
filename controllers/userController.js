@@ -1,30 +1,43 @@
-const express = require("express");
-const router = express.Router();
-const User = require("../models/User");
+const User = require("../models/userModel");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-// POST endpoint to add a new user
-router.post("/", async (req, res) => {
+exports.register = async (req, res) => {
+  const { username, email, password, role } = req.body;
+
   try {
-    const { username, email, password, role } = req.body; // Destructure necessary fields from request body
-
-    // Check if username or email already exists
-    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "Username or email already exists" });
-    }
-
-    // Create a new user instance using the data from the request body
-    const newUser = new User({ username, email, password, role });
-
-    // Save the user to the database
-    const savedUser = await newUser.save();
-
-    res.status(201).json(savedUser); // Respond with the saved user object
-  } catch (err) {
-    res.status(400).json({ message: err.message }); // If an error occurs, respond with the error message
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      role,
+    });
+    await newUser.save();
+    res.status(201).json(newUser);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
-});
+};
 
-module.exports = router;
+exports.login = async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findOne({ username });
+    if (!user)
+      return res.status(400).json({ error: "Invalid username or password" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res.status(400).json({ error: "Invalid username or password" });
+
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_KEY,
+      { expiresIn: "8h" }
+    );
+    res.status(200).json({ token });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
