@@ -11,8 +11,13 @@ const reviewSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  rating: { type: Number, required: true },
-  comment: { type: String, required: true },
+  rating: {
+    type: Number,
+    required: true,
+    min: 1,
+    max: 10,
+  },
+  comment: { type: String },
   createdAt: { type: Date, default: Date.now },
 });
 
