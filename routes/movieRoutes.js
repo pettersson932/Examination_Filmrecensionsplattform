@@ -1,14 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const movieController = require("../controllers/movieController");
-const { authenticate } = require("../middlewares/auth");
+const {
+  addMovie,
+  getMovies,
+  getMovieById,
+  updateMovieById,
+  deleteMovieById,
+  getReviewsByMovieId,
+} = require("../controllers/movieController");
+const { authUser } = require("../middlewares/auth");
 
 router
-  .post("/", authenticate, movieController.addMovie)
-  .get("/", movieController.getMovies)
-  .get("/:id", movieController.getMovieById)
-  .put("/:id", authenticate, movieController.updateMovieById)
-  .delete("/:id", authenticate, movieController.deleteMovieById)
-  .get("/:id/reviews", movieController.getReviewsByMovieId);
+  .post("/", authUser, addMovie)
+  .get("/", getMovies)
+  .get("/:id", getMovieById)
+  .put("/:id", authUser, updateMovieById)
+  .delete("/:id", authUser, deleteMovieById)
+  .get("/:id/reviews", getReviewsByMovieId);
 
 module.exports = router;

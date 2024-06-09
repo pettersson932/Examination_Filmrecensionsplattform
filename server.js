@@ -1,12 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
-
 const movieRoutes = require("./routes/movieRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const userRoutes = require("./routes/userRoutes");
-//const Movie = require("./models/Movie");
 require("dotenv").config();
-
 const app = express();
 app.use(express.json());
 
