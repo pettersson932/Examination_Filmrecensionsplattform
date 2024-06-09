@@ -1,11 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const movieRoutes = require("./routes/movieRoutes");
-const reviewRoutes = require("./routes/reviewRoutes");
-const userRoutes = require("./routes/userRoutes");
 require("dotenv").config();
 const app = express();
 app.use(express.json());
+
+const movieRoutes = require("./routes/movieRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 mongoose
   .connect(process.env.DB_URI, {})
